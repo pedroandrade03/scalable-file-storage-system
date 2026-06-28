@@ -1,0 +1,6 @@
+@StorageSystem.Api_HostAddress = http://localhost:5096
+
+GET {{StorageSystem.Api_HostAddress}}/openapi/v1.json
+Accept: application/json
+
+###
