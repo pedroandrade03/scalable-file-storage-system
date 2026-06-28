@@ -1,0 +1,10 @@
+.env
+
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/.idea/
+*.user
+*.suo
+*.nupkg
