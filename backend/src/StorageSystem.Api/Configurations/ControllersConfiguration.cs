@@ -23,7 +23,8 @@ namespace StorageSystem.Api.Configurations
             this IServiceCollection services
         )
         {
-            services.AddOpenApi();
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
             return services;
         }
 
@@ -34,7 +35,8 @@ namespace StorageSystem.Api.Configurations
             if (app.Environment.IsDevelopment())
             {   
                 app.UseDeveloperExceptionPage();
-                app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
             return app;
         }
