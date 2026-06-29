@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StorageSystem.Api.ApiModels.Files;
 using StorageSystem.Api.ApiModels.Response;
 using StorageSystem.Application.UseCases.Files.CreateFile;
+using StorageSystem.Application.UseCases.Files.GetFileDownload;
 
 namespace StorageSystem.Api.Controllers;
 
@@ -35,5 +36,21 @@ public class FilesController(IMediator mediator) : ControllerBase
             $"/files/{output.Id}",
             new ApiResponse<CreateFileOutput>(output)
         );
+    }
+
+    [HttpGet("{fileId:guid}/download")]
+    [ProducesResponseType(typeof(ApiResponse<GetFileDownloadOutput>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Download(
+        Guid fileId,
+        CancellationToken cancellationToken
+    )
+    {
+        var output = await mediator.Send(
+            new GetFileDownloadQuery(fileId),
+            cancellationToken
+        );
+
+        return Ok(new ApiResponse<GetFileDownloadOutput>(output));
     }
 }

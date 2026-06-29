@@ -4,6 +4,8 @@ namespace StorageSystem.Domain.Repositories;
 
 public interface IFileRepository
 {
+    Task<FileItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+
     Task<bool> ExistsByNameAsync(
         Guid userId,
         Guid folderId,

@@ -5,7 +5,9 @@ using StorageSystem.Application.Interfaces;
 
 namespace StorageSystem.Infrastructure.Storage;
 
-public class MinioFileUploadUrlProvider(IOptions<MinioOptions> options) : IFileUploadUrlProvider
+public class MinioFileUploadUrlProvider(IOptions<MinioOptions> options) :
+    IFileUploadUrlProvider,
+    IFileDownloadUrlProvider
 {
     private readonly MinioOptions _options = options.Value;
 
@@ -32,6 +34,29 @@ public class MinioFileUploadUrlProvider(IOptions<MinioOptions> options) : IFileU
             .WithExpiry(_options.PresignedUrlExpirySeconds);
 
         return await publicClient.PresignedPutObjectAsync(args);
+    }
+
+    public async Task<string> CreateDownloadUrlAsync(
+        string storageKey,
+        CancellationToken cancellationToken
+    )
+    {
+        ValidateOptions();
+
+        var internalClient = CreateClient(_options.Endpoint);
+        await EnsureBucketExistsAsync(internalClient, cancellationToken);
+
+        var publicEndpoint = string.IsNullOrWhiteSpace(_options.PublicEndpoint)
+            ? _options.Endpoint
+            : _options.PublicEndpoint;
+
+        var publicClient = CreateClient(publicEndpoint);
+        var args = new PresignedGetObjectArgs()
+            .WithBucket(_options.BucketName)
+            .WithObject(storageKey)
+            .WithExpiry(_options.PresignedUrlExpirySeconds);
+
+        return await publicClient.PresignedGetObjectAsync(args);
     }
 
     private async Task EnsureBucketExistsAsync(

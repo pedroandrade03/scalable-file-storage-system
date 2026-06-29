@@ -9,32 +9,33 @@ public class ApiGlobalExceptionFilter(IHostEnvironment environment) : IException
     public void OnException(ExceptionContext context)
     {
         var exception = context.Exception;
+
         var details = exception switch
         {
-            ApplicationValidationException validationException => CreateProblemDetails(
-                StatusCodes.Status422UnprocessableEntity,
+            ApplicationValidationException ex => CreateProblemDetails(
+                StatusCodes.Status400BadRequest,
                 "One or more validation errors occurred.",
                 "ValidationError",
-                validationException.Message,
-                validationException.Errors
+                ex.Message,
+                ex.Errors
             ),
-            NotFoundException => CreateProblemDetails(
+            NotFoundException ex => CreateProblemDetails(
                 StatusCodes.Status404NotFound,
                 "Not Found",
                 "NotFound",
-                exception.Message
+                ex.Message
             ),
-            ConflictException => CreateProblemDetails(
+            ConflictException ex => CreateProblemDetails(
                 StatusCodes.Status409Conflict,
                 "Conflict",
                 "Conflict",
-                exception.Message
+                ex.Message
             ),
             _ => CreateProblemDetails(
                 StatusCodes.Status500InternalServerError,
-                "An unexpected error occurred.",
-                "UnexpectedError",
-                exception.Message
+                "An unexpected error occurred on the server.",
+                "InternalServerError",
+                environment.IsDevelopment() ? exception.Message : "Please contact support."
             )
         };
 
@@ -53,8 +54,7 @@ public class ApiGlobalExceptionFilter(IHostEnvironment environment) : IException
         string title,
         string type,
         string detail,
-        IReadOnlyCollection<string>? errors = null
-    )
+        IReadOnlyCollection<string>? errors = null)
     {
         var details = new ProblemDetails
         {
@@ -64,7 +64,7 @@ public class ApiGlobalExceptionFilter(IHostEnvironment environment) : IException
             Detail = detail
         };
 
-        if (errors is not null)
+        if (errors is not null && errors.Count > 0)
         {
             details.Extensions["errors"] = errors;
         }
