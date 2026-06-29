@@ -9,6 +9,9 @@ public class FileRepository(ApplicationDbContext context) : IFileRepository
 {
     private readonly DbSet<FileItem> _files = context.Files;
 
+    public Task<FileItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        => _files.SingleOrDefaultAsync(file => file.Id == id, cancellationToken);
+
     public Task<bool> ExistsByNameAsync(
         Guid userId,
         Guid folderId,

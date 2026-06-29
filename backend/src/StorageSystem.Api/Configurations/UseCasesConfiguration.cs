@@ -38,6 +38,7 @@ public static class UseCasesConfiguration
         services.AddScoped<IFolderRepository, FolderRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IFileUploadUrlProvider, MinioFileUploadUrlProvider>();
+        services.AddScoped<IFileDownloadUrlProvider, MinioFileUploadUrlProvider>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

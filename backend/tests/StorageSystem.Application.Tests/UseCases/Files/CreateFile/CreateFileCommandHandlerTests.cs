@@ -175,6 +175,9 @@ public class CreateFileCommandHandlerTests
 
         public List<FileItem> InsertedFiles { get; } = [];
 
+        public Task<FileItem?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+            => Task.FromResult<FileItem?>(null);
+
         public Task<bool> ExistsByNameAsync(
             Guid userId,
             Guid folderId,
