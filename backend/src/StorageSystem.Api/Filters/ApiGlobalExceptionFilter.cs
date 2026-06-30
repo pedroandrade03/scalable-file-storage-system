@@ -1,4 +1,5 @@
 using StorageSystem.Application.Exceptions;
+using StorageSystem.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -12,6 +13,13 @@ public class ApiGlobalExceptionFilter(IHostEnvironment environment) : IException
 
         var details = exception switch
         {
+            EntityValidationException ex => CreateProblemDetails(
+                StatusCodes.Status422UnprocessableEntity,
+                "One or more validation errors occurred.",
+                "EntityValidationError",
+                ex.Message ?? "Validation failed.",
+                ex.Errors?.Select(error => error.Message).ToArray()
+            ),
             ApplicationValidationException ex => CreateProblemDetails(
                 StatusCodes.Status400BadRequest,
                 "One or more validation errors occurred.",
@@ -29,6 +37,12 @@ public class ApiGlobalExceptionFilter(IHostEnvironment environment) : IException
                 StatusCodes.Status409Conflict,
                 "Conflict",
                 "Conflict",
+                ex.Message
+            ),
+            UnauthorizedAccessException ex => CreateProblemDetails(
+                StatusCodes.Status401Unauthorized,
+                "Unauthorized",
+                "Unauthorized",
                 ex.Message
             ),
             _ => CreateProblemDetails(

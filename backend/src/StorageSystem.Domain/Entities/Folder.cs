@@ -1,31 +1,44 @@
 using StorageSystem.Domain.SeedWork;
+using StorageSystem.Domain.Validation;
 
 namespace StorageSystem.Domain.Entities;
 
 public class Folder : AggregateRoot
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
     public Guid UserId { get; private set; }
-    public Guid? ParentFolderId { get; private set; } 
+    public Guid? ParentFolderId { get; private set; }
 
     private readonly List<Folder> _subFolders = new();
     public IReadOnlyCollection<Folder> SubFolders => _subFolders.AsReadOnly();
 
+    private Folder()
+    {
+    }
+
     public Folder(string name, Guid userId, Guid? parentFolderId = null)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Folder name cannot be empty", nameof(name));
-
-        Name = name.Trim();
+        Name = name;
         UserId = userId;
         ParentFolderId = parentFolderId;
+
+        Validate();
+
+        Name = name.Trim();
     }
 
     public void Rename(string newName)
     {
-        if (string.IsNullOrWhiteSpace(newName))
-            throw new ArgumentException("Folder name cannot be empty");
-            
         Name = newName;
+
+        Validate();
+
+        Name = newName.Trim();
+    }
+
+    private void Validate()
+    {
+        DomainValidation.NotNullOrEmpty(Name, nameof(Name));
+        DomainValidation.MaxLength(Name, 255, nameof(Name));
     }
 }

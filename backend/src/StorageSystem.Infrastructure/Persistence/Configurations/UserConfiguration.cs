@@ -20,7 +20,18 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(320)
             .IsRequired();
 
+        builder.Property(user => user.ExternalProvider)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(user => user.ExternalSubject)
+            .HasMaxLength(200)
+            .IsRequired();
+
         builder.HasIndex(user => user.Email)
+            .IsUnique();
+
+        builder.HasIndex(user => new { user.ExternalProvider, user.ExternalSubject })
             .IsUnique();
 
         builder.Property(user => user.CreatedAt)

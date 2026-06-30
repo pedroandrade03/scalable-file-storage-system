@@ -1,7 +1,9 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StorageSystem.Api.ApiModels.Files;
 using StorageSystem.Api.ApiModels.Response;
+using StorageSystem.Application.Interfaces;
 using StorageSystem.Application.UseCases.Files.CreateFile;
 using StorageSystem.Application.UseCases.Files.GetFileDownload;
 
@@ -9,7 +11,11 @@ namespace StorageSystem.Api.Controllers;
 
 [ApiController]
 [Route("files")]
-public class FilesController(IMediator mediator) : ControllerBase
+[Authorize]
+public class FilesController(
+    IMediator mediator,
+    ICurrentUserAccessor currentUser
+) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<CreateFileOutput>), StatusCodes.Status201Created)]
@@ -21,13 +27,15 @@ public class FilesController(IMediator mediator) : ControllerBase
         CancellationToken cancellationToken
     )
     {
+        var userId = await currentUser.GetUserIdAsync(cancellationToken);
+
         var output = await mediator.Send(
             new CreateFileCommand(
                 request.Name,
                 request.ContentType,
                 request.SizeBytes,
                 request.FolderId,
-                request.UserId
+                userId
             ),
             cancellationToken
         );

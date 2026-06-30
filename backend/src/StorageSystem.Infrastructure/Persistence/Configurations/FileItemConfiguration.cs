@@ -4,7 +4,7 @@ using StorageSystem.Domain.Entities;
 
 namespace StorageSystem.Infrastructure.Persistence.Configurations;
 
-public class FileItemConfiguration : IEntityTypeConfiguration<FileItem>
+public class FileConfiguration : IEntityTypeConfiguration<FileItem>
 {
     public void Configure(EntityTypeBuilder<FileItem> builder)
     {
