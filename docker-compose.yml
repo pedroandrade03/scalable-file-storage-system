@@ -18,6 +18,31 @@ services:
       timeout: 5s
       retries: 5
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak_auth
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD:-admin}
+      KC_HEALTH_ENABLED: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_URL: http://localhost:8081
+      KC_HOSTNAME_STRICT: "false"
+    command: start-dev --import-realm
+    ports:
+      - "8081:8080"
+      - "9002:9000"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./keycloak/realm-storage-system.json:/opt/keycloak/data/import/realm-storage-system.json:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && cat <&3 | grep -q '\"status\": \"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
   postgres:
     image: postgres:18-alpine
     container_name: postgres_db
@@ -41,6 +66,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: dotnet_api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8080:8080"
     environment:
@@ -54,13 +81,20 @@ services:
       - Minio__PresignedUrlExpirySeconds=900
       - ASPNETCORE_ENVIRONMENT=Development
       - ApplyMigrations=true
+      - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://localhost:8081/realms/StorageSystemRealm}
+      - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-storage-swagger}
+      - Keycloak__MetadataAddress=${KEYCLOAK_METADATA_ADDRESS:-http://host.docker.internal:8081/realms/StorageSystemRealm/.well-known/openid-configuration}
+      - Keycloak__ValidIssuer=${KEYCLOAK_VALID_ISSUER:-http://localhost:8081/realms/StorageSystemRealm}
     depends_on:
       postgres:
         condition: service_healthy
       minio:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
     restart: unless-stopped
 
 volumes:
   minio_data:
   postgres_data:
+  keycloak_data:
