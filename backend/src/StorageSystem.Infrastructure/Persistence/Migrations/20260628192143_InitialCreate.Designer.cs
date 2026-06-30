@@ -25,7 +25,7 @@ namespace StorageSystem.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("StorageSystem.Domain.Entities.FileItem", b =>
+            modelBuilder.Entity("StorageSystem.Domain.Entities.File", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,7 +142,7 @@ namespace StorageSystem.Infrastructure.Persistence.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("StorageSystem.Domain.Entities.FileItem", b =>
+            modelBuilder.Entity("StorageSystem.Domain.Entities.File", b =>
                 {
                     b.HasOne("StorageSystem.Domain.Entities.Folder", null)
                         .WithMany()

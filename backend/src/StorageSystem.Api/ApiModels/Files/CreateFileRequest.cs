@@ -4,6 +4,5 @@ public sealed record CreateFileRequest(
     string Name,
     string ContentType,
     long SizeBytes,
-    Guid FolderId,
-    Guid UserId
+    Guid FolderId
 );

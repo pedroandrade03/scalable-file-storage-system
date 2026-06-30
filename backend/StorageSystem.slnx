@@ -1,7 +1,13 @@
 <Solution>
-  <Project Path="src/StorageSystem.Api/StorageSystem.Api.csproj" />
-  <Project Path="src/StorageSystem.Application/StorageSystem.Application.csproj" />
-  <Project Path="src/StorageSystem.Domain/StorageSystem.Domain.csproj" />
-  <Project Path="src/StorageSystem.Infrastructure/StorageSystem.Infrastructure.csproj" />
-  <Project Path="tests/StorageSystem.Application.Tests/StorageSystem.Application.Tests.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/StorageSystem.Api/StorageSystem.Api.csproj" />
+    <Project Path="src/StorageSystem.Application/StorageSystem.Application.csproj" />
+    <Project Path="src/StorageSystem.Domain/StorageSystem.Domain.csproj" />
+    <Project Path="src/StorageSystem.Infrastructure/StorageSystem.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/StorageSystem.EndToEndTests/StorageSystem.EndToEndTests.csproj" />
+    <Project Path="tests/StorageSystem.IntegrationTests/StorageSystem.IntegrationTests.csproj" />
+    <Project Path="tests/StorageSystem.UnitTests/StorageSystem.UnitTests.csproj" />
+  </Folder>
 </Solution>

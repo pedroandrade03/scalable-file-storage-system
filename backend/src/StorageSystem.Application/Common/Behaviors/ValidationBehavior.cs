@@ -17,7 +17,7 @@ public class ValidationBehavior<TRequest, TResponse>(
     {
         if (!validators.Any())
         {
-            return await next();
+            return await next(cancellationToken);
         }
 
         var context = new ValidationContext<TRequest>(request);
