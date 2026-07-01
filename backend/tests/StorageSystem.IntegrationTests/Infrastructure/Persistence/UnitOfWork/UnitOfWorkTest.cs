@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using UnitOfWorkInfra = StorageSystem.Infrastructure.Persistence.UnitOfWork;
+using EfUnitOfWork = StorageSystem.Infrastructure.Data.EF.Persistence.UnitOfWork.EfUnitOfWork;
 
 namespace StorageSystem.IntegrationTests.Infrastructure.Persistence.UnitOfWork;
 
@@ -18,12 +18,29 @@ public class UnitOfWorkTest
         var dbContext = _fixture.CreateDbContext();
         var exampleUsers = _fixture.GetExampleUsersList();
         await dbContext.Users.AddRangeAsync(exampleUsers);
-        var unitOfWork = new UnitOfWorkInfra(dbContext);
+        var unitOfWork = new EfUnitOfWork(dbContext);
 
         await unitOfWork.CommitAsync(CancellationToken.None);
 
         var assertDbContext = _fixture.CreateDbContext(true);
         var savedUsers = assertDbContext.Users.AsNoTracking().ToList();
         savedUsers.Should().HaveCount(exampleUsers.Count);
+    }
+
+    [Fact(DisplayName = nameof(RollbackDiscardsTrackedChanges))]
+    [Trait("Integration/Infrastructure", "UnitOfWork - Persistence")]
+    public async Task RollbackDiscardsTrackedChanges()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var exampleUsers = _fixture.GetExampleUsersList();
+        await dbContext.Users.AddRangeAsync(exampleUsers);
+        var unitOfWork = new EfUnitOfWork(dbContext);
+
+        await unitOfWork.RollbackAsync(CancellationToken.None);
+        await unitOfWork.CommitAsync(CancellationToken.None);
+
+        var assertDbContext = _fixture.CreateDbContext(true);
+        var savedUsers = assertDbContext.Users.AsNoTracking().ToList();
+        savedUsers.Should().BeEmpty();
     }
 }

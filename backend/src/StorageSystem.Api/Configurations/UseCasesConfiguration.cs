@@ -4,9 +4,9 @@ using StorageSystem.Application.Common.Behaviors;
 using StorageSystem.Application.Interfaces;
 using StorageSystem.Application.UseCases.Folders.CreateFolder;
 using StorageSystem.Domain.Repositories;
-using StorageSystem.Infrastructure.Persistence;
-using StorageSystem.Infrastructure.Repositories;
-using StorageSystem.Infrastructure.Storage;
+using StorageSystem.Infrastructure.Data.EF.Persistence.UnitOfWork;
+using StorageSystem.Infrastructure.Data.EF.Repositories;
+using StorageSystem.Infrastructure.Storage.Minio;
 
 namespace StorageSystem.Api.Configurations;
 
@@ -39,7 +39,8 @@ public static class UseCasesConfiguration
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IFileUploadUrlProvider, MinioFileUploadUrlProvider>();
         services.AddScoped<IFileDownloadUrlProvider, MinioFileUploadUrlProvider>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IFileStorageRemover, MinioFileUploadUrlProvider>();
+        services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
         return services;
     }

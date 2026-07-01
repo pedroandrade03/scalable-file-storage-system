@@ -3,7 +3,8 @@
     <Project Path="src/StorageSystem.Api/StorageSystem.Api.csproj" />
     <Project Path="src/StorageSystem.Application/StorageSystem.Application.csproj" />
     <Project Path="src/StorageSystem.Domain/StorageSystem.Domain.csproj" />
-    <Project Path="src/StorageSystem.Infrastructure/StorageSystem.Infrastructure.csproj" />
+    <Project Path="src/StorageSystem.Infrastructure.Data.EF/StorageSystem.Infrastructure.Data.EF.csproj" />
+    <Project Path="src/StorageSystem.Infrastructure.Storage/StorageSystem.Infrastructure.Storage.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/StorageSystem.EndToEndTests/StorageSystem.EndToEndTests.csproj" />

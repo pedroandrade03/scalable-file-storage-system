@@ -4,7 +4,8 @@ WORKDIR /src
 COPY src/StorageSystem.Api/StorageSystem.Api.csproj src/StorageSystem.Api/
 COPY src/StorageSystem.Application/StorageSystem.Application.csproj src/StorageSystem.Application/
 COPY src/StorageSystem.Domain/StorageSystem.Domain.csproj src/StorageSystem.Domain/
-COPY src/StorageSystem.Infrastructure/StorageSystem.Infrastructure.csproj src/StorageSystem.Infrastructure/
+COPY src/StorageSystem.Infrastructure.Data.EF/StorageSystem.Infrastructure.Data.EF.csproj src/StorageSystem.Infrastructure.Data.EF/
+COPY src/StorageSystem.Infrastructure.Storage/StorageSystem.Infrastructure.Storage.csproj src/StorageSystem.Infrastructure.Storage/
 
 RUN dotnet restore src/StorageSystem.Api/StorageSystem.Api.csproj
 

@@ -20,7 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StorageSystem.Application\StorageSystem.Application.csproj" />
-    <ProjectReference Include="..\StorageSystem.Infrastructure\StorageSystem.Infrastructure.csproj" />
+    <ProjectReference Include="..\StorageSystem.Infrastructure.Data.EF\StorageSystem.Infrastructure.Data.EF.csproj" />
+    <ProjectReference Include="..\StorageSystem.Infrastructure.Storage\StorageSystem.Infrastructure.Storage.csproj" />
   </ItemGroup>
 
 </Project>

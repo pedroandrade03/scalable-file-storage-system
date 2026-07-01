@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
-using StorageSystem.Infrastructure.Persistence;
+using StorageSystem.Infrastructure.Data.EF.Persistence.Contexts;
 
 namespace StorageSystem.Api.Configurations
 {

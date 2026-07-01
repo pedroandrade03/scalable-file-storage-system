@@ -3,11 +3,12 @@ using Minio;
 using Minio.DataModel.Args;
 using StorageSystem.Application.Interfaces;
 
-namespace StorageSystem.Infrastructure.Storage;
+namespace StorageSystem.Infrastructure.Storage.Minio;
 
 public class MinioFileUploadUrlProvider(IOptions<MinioOptions> options) :
     IFileUploadUrlProvider,
-    IFileDownloadUrlProvider
+    IFileDownloadUrlProvider,
+    IFileStorageRemover
 {
     private readonly MinioOptions _options = options.Value;
 
@@ -57,6 +58,20 @@ public class MinioFileUploadUrlProvider(IOptions<MinioOptions> options) :
             .WithExpiry(_options.PresignedUrlExpirySeconds);
 
         return await publicClient.PresignedGetObjectAsync(args);
+    }
+
+    public async Task DeleteAsync(string storageKey, CancellationToken cancellationToken)
+    {
+        ValidateOptions();
+
+        var internalClient = CreateClient(_options.Endpoint);
+        await EnsureBucketExistsAsync(internalClient, cancellationToken);
+
+        var args = new RemoveObjectArgs()
+            .WithBucket(_options.BucketName)
+            .WithObject(storageKey);
+
+        await internalClient.RemoveObjectAsync(args, cancellationToken);
     }
 
     private async Task EnsureBucketExistsAsync(

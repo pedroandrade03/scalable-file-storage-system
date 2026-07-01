@@ -1,4 +1,4 @@
-namespace StorageSystem.Infrastructure.Storage;
+namespace StorageSystem.Infrastructure.Storage.Minio;
 
 public class MinioOptions
 {

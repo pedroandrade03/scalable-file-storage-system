@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StorageSystem.Domain.Entities;
 
-namespace StorageSystem.Infrastructure.Persistence.Configurations;
+namespace StorageSystem.Infrastructure.Data.EF.Persistence.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {

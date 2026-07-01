@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace StorageSystem.Infrastructure.Persistence.Migrations
+namespace StorageSystem.Infrastructure.Data.EF.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class AddUserExternalIdentity : Migration
