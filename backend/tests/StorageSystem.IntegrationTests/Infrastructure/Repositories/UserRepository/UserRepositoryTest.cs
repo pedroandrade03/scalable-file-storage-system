@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Repository = StorageSystem.Infrastructure.Repositories;
+using Repository = StorageSystem.Infrastructure.Data.EF.Repositories;
 
 namespace StorageSystem.IntegrationTests.Infrastructure.Repositories.UserRepository;
 
