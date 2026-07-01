@@ -27,7 +27,7 @@
     <ProjectReference Include="..\..\src\StorageSystem.Api\StorageSystem.Api.csproj" />
     <ProjectReference Include="..\..\src\StorageSystem.Application\StorageSystem.Application.csproj" />
     <ProjectReference Include="..\..\src\StorageSystem.Domain\StorageSystem.Domain.csproj" />
-    <ProjectReference Include="..\..\src\StorageSystem.Infrastructure\StorageSystem.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\StorageSystem.Infrastructure.Data.EF\StorageSystem.Infrastructure.Data.EF.csproj" />
   </ItemGroup>
 
   <ItemGroup>

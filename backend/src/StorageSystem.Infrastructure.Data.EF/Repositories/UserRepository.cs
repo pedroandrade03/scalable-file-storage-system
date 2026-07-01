@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using StorageSystem.Domain.Entities;
 using StorageSystem.Domain.Repositories;
-using StorageSystem.Infrastructure.Persistence;
+using StorageSystem.Infrastructure.Data.EF.Persistence.Contexts;
 
-namespace StorageSystem.Infrastructure.Repositories;
+namespace StorageSystem.Infrastructure.Data.EF.Repositories;
 
 public class UserRepository(ApplicationDbContext context) : IUserRepository
 {

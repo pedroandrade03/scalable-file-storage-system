@@ -1,6 +1,6 @@
 using Bogus;
 using Microsoft.EntityFrameworkCore;
-using StorageSystem.Infrastructure.Persistence;
+using StorageSystem.Infrastructure.Data.EF.Persistence.Contexts;
 
 namespace StorageSystem.EndToEndTests.Common;
 

@@ -1,8 +1,9 @@
 using Bogus;
 using Microsoft.EntityFrameworkCore;
 using StorageSystem.Domain.Entities;
-using StorageSystem.Infrastructure.Persistence;
-using StorageSystem.Infrastructure.Repositories;
+using StorageSystem.Infrastructure.Data.EF.Persistence.Contexts;
+using StorageSystem.Infrastructure.Data.EF.Persistence.UnitOfWork;
+using StorageSystem.Infrastructure.Data.EF.Repositories;
 
 namespace StorageSystem.IntegrationTests.Base;
 
@@ -26,7 +27,7 @@ public abstract class BaseFixture
         return context;
     }
 
-    public UnitOfWork CreateUnitOfWork(ApplicationDbContext context) => new(context);
+    public EfUnitOfWork CreateUnitOfWork(ApplicationDbContext context) => new(context);
 
     public FolderRepository CreateFolderRepository(ApplicationDbContext context) => new(context);
 

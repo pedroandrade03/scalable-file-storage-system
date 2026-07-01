@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StorageSystem.Domain.Entities;
 
-namespace StorageSystem.Infrastructure.Persistence;
+namespace StorageSystem.Infrastructure.Data.EF.Persistence.Contexts;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
