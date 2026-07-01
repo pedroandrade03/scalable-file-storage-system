@@ -5,6 +5,7 @@ using StorageSystem.Api.ApiModels.Folders;
 using StorageSystem.Api.ApiModels.Response;
 using StorageSystem.Application.Interfaces;
 using StorageSystem.Application.UseCases.Folders.CreateFolder;
+using StorageSystem.Application.UseCases.Folders.DeleteFolder;
 
 namespace StorageSystem.Api.Controllers;
 
@@ -41,5 +42,24 @@ public class FoldersController(
             $"/folders/{output.Id}",
             new ApiResponse<CreateFolderOutput>(output)
         );
+    }
+
+    [HttpDelete("{folderId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Delete(
+        Guid folderId,
+        CancellationToken cancellationToken
+    )
+    {
+        var userId = await currentUser.GetUserIdAsync(cancellationToken);
+
+        await mediator.Send(
+            new DeleteFolderCommand(folderId, userId),
+            cancellationToken
+        );
+
+        return NoContent();
     }
 }

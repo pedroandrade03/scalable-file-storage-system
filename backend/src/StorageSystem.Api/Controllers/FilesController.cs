@@ -5,6 +5,7 @@ using StorageSystem.Api.ApiModels.Files;
 using StorageSystem.Api.ApiModels.Response;
 using StorageSystem.Application.Interfaces;
 using StorageSystem.Application.UseCases.Files.CreateFile;
+using StorageSystem.Application.UseCases.Files.DeleteFile;
 using StorageSystem.Application.UseCases.Files.GetFileDownload;
 
 namespace StorageSystem.Api.Controllers;
@@ -60,5 +61,23 @@ public class FilesController(
         );
 
         return Ok(new ApiResponse<GetFileDownloadOutput>(output));
+    }
+
+    [HttpDelete("{fileId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(
+        Guid fileId,
+        CancellationToken cancellationToken
+    )
+    {
+        var userId = await currentUser.GetUserIdAsync(cancellationToken);
+
+        await mediator.Send(
+            new DeleteFileCommand(fileId, userId),
+            cancellationToken
+        );
+
+        return NoContent();
     }
 }

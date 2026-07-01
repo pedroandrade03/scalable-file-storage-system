@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using StorageSystem.Application.Interfaces;
 
 namespace StorageSystem.EndToEndTests.Common;
@@ -22,4 +23,24 @@ public sealed class FakeFileDownloadUrlProvider : IFileDownloadUrlProvider
         string storageKey,
         CancellationToken cancellationToken
     ) => Task.FromResult($"{DownloadUrl}/{storageKey}");
+}
+
+public sealed class FakeFileStorageRemover : IFileStorageRemover
+{
+    private static readonly ConcurrentBag<string> DeletedKeys = [];
+
+    public static IReadOnlyCollection<string> DeletedStorageKeys => DeletedKeys.ToArray();
+
+    public static void Reset()
+    {
+        while (DeletedKeys.TryTake(out _))
+        {
+        }
+    }
+
+    public Task DeleteAsync(string storageKey, CancellationToken cancellationToken)
+    {
+        DeletedKeys.Add(storageKey);
+        return Task.CompletedTask;
+    }
 }

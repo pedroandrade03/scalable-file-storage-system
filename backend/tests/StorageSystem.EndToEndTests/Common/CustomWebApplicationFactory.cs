@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StorageSystem.Application.Interfaces;
-using StorageSystem.Infrastructure.Persistence;
+using StorageSystem.Infrastructure.Data.EF.Persistence.Contexts;
 
 namespace StorageSystem.EndToEndTests.Common;
 
@@ -73,8 +73,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         services.RemoveAll<IFileUploadUrlProvider>();
         services.RemoveAll<IFileDownloadUrlProvider>();
+        services.RemoveAll<IFileStorageRemover>();
         services.AddScoped<IFileUploadUrlProvider, FakeFileUploadUrlProvider>();
         services.AddScoped<IFileDownloadUrlProvider, FakeFileDownloadUrlProvider>();
+        services.AddScoped<IFileStorageRemover, FakeFileStorageRemover>();
     }
 
     private static void ReplaceAuthentication(IServiceCollection services)

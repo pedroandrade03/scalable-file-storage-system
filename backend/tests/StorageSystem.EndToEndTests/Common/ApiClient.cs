@@ -40,6 +40,16 @@ public class ApiClient(HttpClient httpClient)
         return (response, output);
     }
 
+    public async Task<(HttpResponseMessage Message, TOutput? Output)> DeleteAsync<TOutput>(
+        string route
+    )
+        where TOutput : class
+    {
+        var response = await httpClient.DeleteAsync(route);
+        var output = await DeserializeAsync<TOutput>(response);
+        return (response, output);
+    }
+
     private async Task<TOutput?> DeserializeAsync<TOutput>(HttpResponseMessage response)
         where TOutput : class
     {
