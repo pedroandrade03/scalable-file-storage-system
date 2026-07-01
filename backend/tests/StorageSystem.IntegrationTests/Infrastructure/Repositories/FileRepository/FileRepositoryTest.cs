@@ -1,5 +1,6 @@
 using FluentAssertions;
-using Repository = StorageSystem.Infrastructure.Repositories;
+using StorageSystem.Infrastructure.Data.EF.Persistence.UnitOfWork;
+using Repository = StorageSystem.Infrastructure.Data.EF.Repositories;
 
 namespace StorageSystem.IntegrationTests.Infrastructure.Repositories.FileRepository;
 
@@ -68,6 +69,71 @@ public class FileRepositoryTest
         dbFile.Should().BeNull();
     }
 
+    [Fact(DisplayName = nameof(GetByIdAndUserIdReturnsFileWhenOwnedByUser))]
+    [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
+    public async Task GetByIdAndUserIdReturnsFileWhenOwnedByUser()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var userId = Guid.NewGuid();
+        var folderId = Guid.NewGuid();
+        var exampleFile = _fixture.GetExampleFile(userId, folderId);
+        await dbContext.Files.AddAsync(exampleFile);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FileRepository(_fixture.CreateDbContext(true));
+
+        var dbFile = await repository.GetByIdAndUserIdAsync(
+            exampleFile.Id,
+            userId,
+            CancellationToken.None
+        );
+
+        dbFile.Should().NotBeNull();
+        dbFile!.Id.Should().Be(exampleFile.Id);
+        dbFile.UserId.Should().Be(userId);
+    }
+
+    [Fact(DisplayName = nameof(GetByIdAndUserIdReturnsNullWhenFileBelongsToAnotherUser))]
+    [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
+    public async Task GetByIdAndUserIdReturnsNullWhenFileBelongsToAnotherUser()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var ownerUserId = Guid.NewGuid();
+        var anotherUserId = Guid.NewGuid();
+        var exampleFile = _fixture.GetExampleFile(ownerUserId);
+        await dbContext.Files.AddAsync(exampleFile);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FileRepository(_fixture.CreateDbContext(true));
+
+        var dbFile = await repository.GetByIdAndUserIdAsync(
+            exampleFile.Id,
+            anotherUserId,
+            CancellationToken.None
+        );
+
+        dbFile.Should().BeNull();
+    }
+
+    [Fact(DisplayName = nameof(GetByIdAndUserIdReturnsNullWhenFileDoesNotExist))]
+    [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
+    public async Task GetByIdAndUserIdReturnsNullWhenFileDoesNotExist()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        await dbContext.Files.AddAsync(_fixture.GetExampleFile());
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FileRepository(_fixture.CreateDbContext(true));
+
+        var dbFile = await repository.GetByIdAndUserIdAsync(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            CancellationToken.None
+        );
+
+        dbFile.Should().BeNull();
+    }
+
     [Fact(DisplayName = nameof(ExistsByNameReturnsTrueWhenPresent))]
     [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
     public async Task ExistsByNameReturnsTrueWhenPresent()
@@ -112,5 +178,88 @@ public class FileRepositoryTest
         );
 
         exists.Should().BeFalse();
+    }
+
+    [Fact(DisplayName = nameof(ExistsInFolderReturnsTrueWhenOwnedFolderHasFiles))]
+    [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
+    public async Task ExistsInFolderReturnsTrueWhenOwnedFolderHasFiles()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var userId = Guid.NewGuid();
+        var folderId = Guid.NewGuid();
+        var file = _fixture.GetExampleFile(userId, folderId);
+        await dbContext.Files.AddAsync(file);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FileRepository(_fixture.CreateDbContext(true));
+
+        var exists = await repository.ExistsInFolderAsync(
+            folderId,
+            userId,
+            CancellationToken.None
+        );
+
+        exists.Should().BeTrue();
+    }
+
+    [Fact(DisplayName = nameof(ExistsInFolderReturnsFalseWhenFolderHasNoFiles))]
+    [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
+    public async Task ExistsInFolderReturnsFalseWhenFolderHasNoFiles()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        await dbContext.Files.AddAsync(_fixture.GetExampleFile());
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FileRepository(_fixture.CreateDbContext(true));
+
+        var exists = await repository.ExistsInFolderAsync(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            CancellationToken.None
+        );
+
+        exists.Should().BeFalse();
+    }
+
+    [Fact(DisplayName = nameof(ExistsInFolderReturnsFalseForAnotherUsersFile))]
+    [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
+    public async Task ExistsInFolderReturnsFalseForAnotherUsersFile()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var folderId = Guid.NewGuid();
+        var file = _fixture.GetExampleFile(Guid.NewGuid(), folderId);
+        await dbContext.Files.AddAsync(file);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FileRepository(_fixture.CreateDbContext(true));
+
+        var exists = await repository.ExistsInFolderAsync(
+            folderId,
+            Guid.NewGuid(),
+            CancellationToken.None
+        );
+
+        exists.Should().BeFalse();
+    }
+
+    [Fact(DisplayName = nameof(DeleteRemovesMetadataAfterCommit))]
+    [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
+    public async Task DeleteRemovesMetadataAfterCommit()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var exampleFile = _fixture.GetExampleFile();
+        await dbContext.Files.AddAsync(exampleFile);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FileRepository(dbContext);
+        var unitOfWork = new EfUnitOfWork(dbContext);
+
+        await repository.DeleteAsync(exampleFile, CancellationToken.None);
+        await unitOfWork.CommitAsync(CancellationToken.None);
+
+        var deletedFile = await _fixture.CreateDbContext(true)
+            .Files.FindAsync(exampleFile.Id);
+
+        deletedFile.Should().BeNull();
     }
 }
