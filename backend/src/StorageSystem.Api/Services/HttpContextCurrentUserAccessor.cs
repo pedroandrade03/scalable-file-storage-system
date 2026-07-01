@@ -30,7 +30,8 @@ public sealed class HttpContextCurrentUserAccessor(
 
     public string? Subject =>
         Principal?.FindFirstValue(ClaimTypes.NameIdentifier)
-        ?? Principal?.FindFirstValue("sub");
+        ?? Principal?.FindFirstValue("sub")
+        ?? Principal?.FindFirstValue("preferred_username");
 
     public async Task<Guid> GetUserIdAsync(CancellationToken cancellationToken = default)
     {

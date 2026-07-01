@@ -15,16 +15,15 @@ public class TestAuthHandler(
     public const string SchemeName = "Test";
     public const string TestUserEmail = "e2e@storage.local";
     public const string TestUserName = "E2E User";
-    public const string TestUserSubject = "e2e-subject";
+    public const string TestPreferredUsername = "e2e-user";
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, TestUserSubject),
-            new Claim("sub", TestUserSubject),
             new Claim(ClaimTypes.Name, TestUserName),
             new Claim("name", TestUserName),
+            new Claim("preferred_username", TestPreferredUsername),
             new Claim(ClaimTypes.Email, TestUserEmail),
             new Claim("email", TestUserEmail)
         };
