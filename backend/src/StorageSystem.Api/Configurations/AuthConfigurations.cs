@@ -28,6 +28,11 @@ namespace StorageSystem.Api.Configurations
             var validIssuer = configuration["Keycloak:ValidIssuer"] ?? authority;
             var validClientId = configuration["Keycloak:ClientId"]
                 ?? throw new InvalidOperationException("Keycloak:ClientId is required.");
+            var validClientIds = configuration
+                .GetSection("Keycloak:AllowedClientIds")
+                .Get<string[]>()
+                ?? [validClientId];
+            var validClientIdSet = validClientIds.ToHashSet(StringComparer.Ordinal);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -50,7 +55,7 @@ namespace StorageSystem.Api.Configurations
                         OnTokenValidated = context =>
                         {
                             var authorizedParty = context.Principal?.FindFirst("azp")?.Value;
-                            if (authorizedParty != validClientId)
+                            if (authorizedParty is null || !validClientIdSet.Contains(authorizedParty))
                             {
                                 context.Fail(
                                     $"The authorized party '{authorizedParty ?? "empty"}' is invalid."

@@ -8,6 +8,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${MINIO_CORS_ALLOW_ORIGIN:-http://localhost:4200}
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -83,8 +84,11 @@ services:
       - ApplyMigrations=true
       - Keycloak__Authority=${KEYCLOAK_AUTHORITY:-http://localhost:8081/realms/StorageSystemRealm}
       - Keycloak__ClientId=${KEYCLOAK_CLIENT_ID:-storage-swagger}
+      - Keycloak__AllowedClientIds__0=${KEYCLOAK_FRONTEND_CLIENT_ID:-storage-frontend}
+      - Keycloak__AllowedClientIds__1=${KEYCLOAK_CLIENT_ID:-storage-swagger}
       - Keycloak__MetadataAddress=${KEYCLOAK_METADATA_ADDRESS:-http://host.docker.internal:8081/realms/StorageSystemRealm/.well-known/openid-configuration}
       - Keycloak__ValidIssuer=${KEYCLOAK_VALID_ISSUER:-http://localhost:8081/realms/StorageSystemRealm}
+      - AllowedOrigins__0=${FRONTEND_ORIGIN:-http://localhost:4200}
     depends_on:
       postgres:
         condition: service_healthy
