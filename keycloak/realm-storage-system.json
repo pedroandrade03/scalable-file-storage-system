@@ -43,44 +43,6 @@
         "offline_access",
         "microprofile-jwt"
       ]
-    },
-    {
-      "clientId": "storage-frontend",
-      "name": "Angular Frontend",
-      "enabled": true,
-      "publicClient": true,
-      "protocol": "openid-connect",
-      "rootUrl": "http://localhost:4200",
-      "baseUrl": "http://localhost:4200",
-      "redirectUris": [
-        "http://localhost:4200/*"
-      ],
-      "webOrigins": [
-        "http://localhost:4200"
-      ],
-      "standardFlowEnabled": true,
-      "directAccessGrantsEnabled": false,
-      "implicitFlowEnabled": false,
-      "serviceAccountsEnabled": false,
-      "fullScopeAllowed": true,
-      "attributes": {
-        "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:4200/*"
-      },
-      "defaultClientScopes": [
-        "openid",
-        "web-origins",
-        "acr",
-        "profile",
-        "roles",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
     }
   ],
   "users": [

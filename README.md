@@ -88,7 +88,6 @@ KEYCLOAK_USER=admin
 KEYCLOAK_PASSWORD=change-me
 KEYCLOAK_AUTHORITY=http://localhost:8081/realms/StorageSystemRealm
 KEYCLOAK_CLIENT_ID=storage-swagger
-KEYCLOAK_FRONTEND_CLIENT_ID=storage-frontend
 KEYCLOAK_METADATA_ADDRESS=http://host.docker.internal:8081/realms/StorageSystemRealm/.well-known/openid-configuration
 KEYCLOAK_VALID_ISSUER=http://localhost:8081/realms/StorageSystemRealm
 ```
