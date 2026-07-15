@@ -37,6 +37,6 @@ public class ValidationBehavior<TRequest, TResponse>(
             throw new ApplicationValidationException(errors);
         }
 
-        return await next();
+        return await next(cancellationToken);
     }
 }

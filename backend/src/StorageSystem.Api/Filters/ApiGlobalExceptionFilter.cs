@@ -17,7 +17,7 @@ public class ApiGlobalExceptionFilter(IHostEnvironment environment) : IException
                 StatusCodes.Status422UnprocessableEntity,
                 "One or more validation errors occurred.",
                 "EntityValidationError",
-                ex.Message ?? "Validation failed.",
+                ex.Message,
                 ex.Errors?.Select(error => error.Message).ToArray()
             ),
             ApplicationValidationException ex => CreateProblemDetails(
