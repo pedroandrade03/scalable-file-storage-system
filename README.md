@@ -10,7 +10,9 @@ This project is designed as a portfolio-grade backend: it keeps infrastructure l
 - Internal domain user provisioning from authenticated tokens.
 - Stable user mapping by `ExternalProvider + ExternalSubject`, instead of relying only on email.
 - Folder creation with nested folder support.
+- Folder content listing with child folders and files.
 - File metadata creation linked to users and folders.
+- File and empty-folder deletion.
 - Multipart upload plans and presigned download URLs backed by MinIO.
 - PostgreSQL persistence with EF Core migrations.
 - Swagger UI with OAuth2 Authorization Code + PKCE flow.
@@ -187,8 +189,7 @@ Test projects:
 
 ## Roadmap
 
-- List folders and files.
-- Rename and delete folders/files.
+- Rename folders and files.
 - User-level storage quotas.
 - File sharing and permission policies.
 - Background cleanup for orphaned objects.
