@@ -194,4 +194,4 @@ Test projects:
 - File sharing and permission policies.
 - Background cleanup for orphaned objects.
 - Observability with structured logs, metrics, and tracing.
-- CI pipeline for build, test, and Docker image validation.
+- Docker image validation and release automation.
