@@ -19,9 +19,6 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     static CustomWebApplicationFactory()
     {
-        // Program reads configuration at service-registration time (before the host is
-        // built), so ConfigureAppConfiguration runs too late. Environment variables are
-        // picked up by WebApplication.CreateBuilder immediately, making them available.
         SetEnvironmentVariable("ConnectionStrings__DefaultConnection",
             "Host=localhost;Database=e2e;Username=e2e;Password=e2e");
         SetEnvironmentVariable("Keycloak__Authority", "https://localhost/realms/test");

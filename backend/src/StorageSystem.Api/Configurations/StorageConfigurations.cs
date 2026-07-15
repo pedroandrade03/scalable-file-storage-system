@@ -39,18 +39,13 @@ public static class StorageConfigurations
             AuthenticationRegion = region
         };
 
-        // Se o Endpoint foi fornecido (ex: MinIO ou S3-compatible em Docker/Local), 
-        // ajustamos as configurações específicas para caminhos e HTTP/HTTPS.
         if (!string.IsNullOrWhiteSpace(endpoint))
         {
             var normalizedEndpoint = NormalizeEndpoint(endpoint, useSsl);
             config.ServiceURL = normalizedEndpoint;
             
-            // ForcePathStyle é OBRIGATÓRIO para MinIO e para a maioria dos provedores locais.
-            // Impede o SDK de tentar prefixar o nome do bucket no host (ex: meu-bucket.localhost).
             config.ForcePathStyle = true; 
             
-            // Assume HTTP simples se for ambiente local sem SSL, caso contrário usa HTTPS.
             config.UseHttp = normalizedEndpoint.StartsWith("http://", StringComparison.OrdinalIgnoreCase);
         }
 
