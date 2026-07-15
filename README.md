@@ -21,21 +21,11 @@ This project is designed as a portfolio-grade backend: it keeps infrastructure l
 
 ## Architecture
 
-```text
-Client / Swagger UI
-        |
-        v
-   .NET Web API
-        |
-        +--> PostgreSQL
-        |    Stores users, folders, file metadata, and hierarchy.
-        |
-        +--> MinIO
-        |    Stores file objects through S3-compatible presigned URLs.
-        |
-        +--> Keycloak
-             Issues OIDC/JWT tokens and manages authentication.
-```
+See [`docs/architecture.md`](docs/architecture.md) for the layered architecture, CQRS flow, dependency rules, authentication model, multipart upload flow, and infrastructure responsibilities.
+
+## Requirements
+
+See [`docs/system-design.md`](docs/system-design.md) for the system purpose, scope, actors, functional requirements, non-functional requirements, out-of-scope items, and acceptance criteria.
 
 ## Tech Stack
 
