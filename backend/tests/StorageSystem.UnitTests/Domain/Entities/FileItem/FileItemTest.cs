@@ -1,5 +1,6 @@
 using FluentAssertions;
 using StorageSystem.Domain.Exceptions;
+using StorageSystem.Domain.Enums;
 using DomainEntity = StorageSystem.Domain.Entities;
 
 namespace StorageSystem.UnitTests.Domain.Entities.FileItem;
@@ -31,6 +32,7 @@ public class FileItemTest
         file.Name.Should().Be(validFile.Name);
         file.ContentType.Should().Be(validFile.ContentType);
         file.SizeBytes.Should().Be(validFile.SizeBytes);
+        file.Status.Should().Be(FileStatus.PendingUpload);
         file.FolderId.Should().Be(validFile.FolderId);
         file.UserId.Should().Be(validFile.UserId);
         file.Id.Should().NotBe(Guid.Empty);
@@ -41,6 +43,24 @@ public class FileItemTest
         file.StorageKey.Should().Contain(file.FolderId.ToString());
         file.StorageKey.Should().Contain(file.Id.ToString());
         file.StorageKey.Should().EndWith(file.Name);
+    }
+
+    [Fact(DisplayName = nameof(MarkUploadCompleted))]
+    [Trait("Domain", "FileItem - Aggregate")]
+    public void MarkUploadCompleted()
+    {
+        var validFile = _fileItemTestFixture.GetValidFileItem();
+        var file = new DomainEntity.FileItem(
+            validFile.Name,
+            validFile.ContentType,
+            validFile.SizeBytes,
+            validFile.FolderId,
+            validFile.UserId
+        );
+
+        file.MarkUploadCompleted();
+
+        file.Status.Should().Be(FileStatus.Available);
     }
 
     [Theory(DisplayName = nameof(InstantiateErrorWhenNameIsEmpty))]

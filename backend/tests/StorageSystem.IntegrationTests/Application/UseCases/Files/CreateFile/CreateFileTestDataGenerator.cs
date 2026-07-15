@@ -10,44 +10,44 @@ public static class CreateFileTestDataGenerator
         const string validContentType = "application/pdf";
         const long validSize = 1024;
 
-        yield return new object[]
-        {
+        yield return
+        [
             string.Empty,
             validContentType,
             validSize,
             string.Format(ValidationMessages.FieldNotNullOrEmpty, "Name")
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             new string('a', 256),
             validContentType,
             validSize,
             string.Format(ValidationMessages.FieldMaxLength, "Name", 255)
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             validName,
             string.Empty,
             validSize,
             string.Format(ValidationMessages.FieldNotNullOrEmpty, "ContentType")
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             validName,
             new string('a', 151),
             validSize,
             string.Format(ValidationMessages.FieldMaxLength, "ContentType", 150)
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             validName,
             validContentType,
             0L,
             string.Format(ValidationMessages.FieldGreaterThanZero, "SizeBytes")
-        };
+        ];
     }
 }

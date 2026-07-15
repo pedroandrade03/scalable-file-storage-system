@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using StorageSystem.Api.ApiModels.Files;
 using StorageSystem.Api.ApiModels.Response;
 using StorageSystem.Application.Interfaces;
+using StorageSystem.Application.UseCases.Files.CompleteFileUpload;
 using StorageSystem.Application.UseCases.Files.CreateFile;
 using StorageSystem.Application.UseCases.Files.DeleteFile;
 using StorageSystem.Application.UseCases.Files.GetFileDownload;
@@ -61,6 +62,31 @@ public class FilesController(
         );
 
         return Ok(new ApiResponse<GetFileDownloadOutput>(output));
+    }
+
+    [HttpPost("{fileId:guid}/complete-upload")]
+    [ProducesResponseType(typeof(ApiResponse<CompleteFileUploadOutput>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CompleteUpload(
+        Guid fileId,
+        [FromBody] CompleteFileUploadRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        var userId = await currentUser.GetUserIdAsync(cancellationToken);
+
+        var output = await mediator.Send(
+            new CompleteFileUploadCommand(
+                fileId,
+                userId,
+                request.UploadId,
+                request.Parts
+            ),
+            cancellationToken
+        );
+
+        return Ok(new ApiResponse<CompleteFileUploadOutput>(output));
     }
 
     [HttpDelete("{fileId:guid}")]

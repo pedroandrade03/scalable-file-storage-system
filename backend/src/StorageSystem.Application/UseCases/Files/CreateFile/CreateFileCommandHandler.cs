@@ -62,7 +62,7 @@ public class CreateFileCommandHandler(
             request.UserId
         );
 
-        var uploadUrl = await uploadUrlProvider.CreateUploadUrlAsync(
+        var upload = await uploadUrlProvider.CreateUploadUrlAsync(
             file.StorageKey,
             file.ContentType,
             file.SizeBytes,
@@ -72,6 +72,6 @@ public class CreateFileCommandHandler(
         await fileRepository.InsertAsync(file, cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken);
 
-        return CreateFileOutput.FromFile(file, uploadUrl);
+        return CreateFileOutput.FromFile(file, upload);
     }
 }

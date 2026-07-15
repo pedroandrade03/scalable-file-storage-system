@@ -15,7 +15,7 @@ public class CreateFileTest
 
     public CreateFileTest(CreateFileTestFixture fixture) => _fixture = fixture;
 
-    private static Mock<IFileUploadUrlProvider> GetUploadUrlProviderMock(string uploadUrl)
+    private static Mock<IFileUploadUrlProvider> GetUploadUrlProviderMock(MultipartUploadPlan uploadPlan)
     {
         var mock = new Mock<IFileUploadUrlProvider>();
         mock.Setup(p => p.CreateUploadUrlAsync(
@@ -24,9 +24,21 @@ public class CreateFileTest
                 It.IsAny<long>(),
                 It.IsAny<CancellationToken>()
             ))
-            .ReturnsAsync(uploadUrl);
+            .ReturnsAsync(uploadPlan);
         return mock;
     }
+
+    private static MultipartUploadPlan GetUploadPlan()
+        => new(
+            "upload-id",
+            5 * 1024 * 1024,
+            2,
+            new DateTimeOffset(2026, 7, 1, 18, 30, 0, TimeSpan.Zero),
+            [
+                new MultipartUploadPartUrl(1, "https://minio.local/upload?partNumber=1"),
+                new MultipartUploadPartUrl(2, "https://minio.local/upload?partNumber=2")
+            ]
+        );
 
     [Fact(DisplayName = nameof(CreateFile))]
     [Trait("Integration/Application", "CreateFile - Use Cases")]
@@ -39,12 +51,12 @@ public class CreateFileTest
         await dbContext.Folders.AddAsync(folder);
         await dbContext.SaveChangesAsync(CancellationToken.None);
 
-        const string uploadUrl = "https://minio.local/upload";
+        var uploadPlan = GetUploadPlan();
         var handler = new CreateFileCommandHandler(
             _fixture.CreateFileRepository(dbContext),
             _fixture.CreateFolderRepository(dbContext),
             _fixture.CreateUserRepository(dbContext),
-            GetUploadUrlProviderMock(uploadUrl).Object,
+            GetUploadUrlProviderMock(uploadPlan).Object,
             _fixture.CreateUnitOfWork(dbContext)
         );
         var command = _fixture.GetValidCommand(user.Id, folder.Id);
@@ -54,7 +66,7 @@ public class CreateFileTest
         output.Should().NotBeNull();
         output.Id.Should().NotBe(Guid.Empty);
         output.Name.Should().Be(command.Name);
-        output.UploadUrl.Should().Be(uploadUrl);
+        output.Upload.Should().BeEquivalentTo(uploadPlan);
         output.UserId.Should().Be(user.Id);
         output.FolderId.Should().Be(folder.Id);
 
@@ -77,7 +89,7 @@ public class CreateFileTest
             _fixture.CreateFileRepository(dbContext),
             _fixture.CreateFolderRepository(dbContext),
             _fixture.CreateUserRepository(dbContext),
-            GetUploadUrlProviderMock("https://minio.local/upload").Object,
+            GetUploadUrlProviderMock(GetUploadPlan()).Object,
             _fixture.CreateUnitOfWork(dbContext)
         );
         var command = _fixture.GetValidCommand(user.Id, Guid.NewGuid());
@@ -116,7 +128,7 @@ public class CreateFileTest
             _fixture.CreateFileRepository(dbContext),
             _fixture.CreateFolderRepository(dbContext),
             _fixture.CreateUserRepository(dbContext),
-            GetUploadUrlProviderMock("https://minio.local/upload").Object,
+            GetUploadUrlProviderMock(GetUploadPlan()).Object,
             _fixture.CreateUnitOfWork(dbContext)
         );
 
@@ -151,7 +163,7 @@ public class CreateFileTest
             _fixture.CreateFileRepository(dbContext),
             _fixture.CreateFolderRepository(dbContext),
             _fixture.CreateUserRepository(dbContext),
-            GetUploadUrlProviderMock("https://minio.local/upload").Object,
+            GetUploadUrlProviderMock(GetUploadPlan()).Object,
             _fixture.CreateUnitOfWork(dbContext)
         );
         var command = new CreateFileCommand(name, contentType, sizeBytes, folder.Id, user.Id);

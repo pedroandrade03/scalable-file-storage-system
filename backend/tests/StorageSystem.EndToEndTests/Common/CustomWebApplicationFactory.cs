@@ -73,9 +73,11 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         services.RemoveAll<IFileUploadUrlProvider>();
         services.RemoveAll<IFileDownloadUrlProvider>();
+        services.RemoveAll<IFileMultipartUploadCompleter>();
         services.RemoveAll<IFileStorageRemover>();
         services.AddScoped<IFileUploadUrlProvider, FakeFileUploadUrlProvider>();
         services.AddScoped<IFileDownloadUrlProvider, FakeFileDownloadUrlProvider>();
+        services.AddScoped<IFileMultipartUploadCompleter, FakeFileMultipartUploadCompleter>();
         services.AddScoped<IFileStorageRemover, FakeFileStorageRemover>();
     }
 

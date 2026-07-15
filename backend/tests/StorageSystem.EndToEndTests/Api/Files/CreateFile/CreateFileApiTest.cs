@@ -34,7 +34,19 @@ public class CreateFileApiTest(CreateFileApiTestFixture fixture) : IDisposable
         output.Data.SizeBytes.Should().Be(sizeBytes);
         output.Data.FolderId.Should().Be(folderId);
         output.Data.StorageKey.Should().NotBeNullOrWhiteSpace();
-        output.Data.UploadUrl.Should().StartWith(FakeFileUploadUrlProvider.UploadUrl);
+        output.Data.Upload.UploadId.Should().Be(FakeFileUploadUrlProvider.UploadId);
+        output.Data.Upload.PartSizeBytes.Should().Be(FakeFileUploadUrlProvider.PartSizeBytes);
+        output.Data.Upload.TotalParts.Should().Be(
+            (int)Math.Ceiling((double)sizeBytes / FakeFileUploadUrlProvider.PartSizeBytes)
+        );
+        output.Data.Upload.Parts.Should().HaveCount(output.Data.Upload.TotalParts);
+        output.Data.Upload.Parts
+            .Select(part => part.PartNumber)
+            .Should()
+            .Equal(Enumerable.Range(1, output.Data.Upload.TotalParts));
+        output.Data.Upload.Parts.Should().OnlyContain(
+            part => part.Url.StartsWith(FakeFileUploadUrlProvider.UploadUrl)
+        );
 
         var dbFile = await fixture.CreateDbContext().Files.FindAsync(output.Data.Id);
         dbFile.Should().NotBeNull();

@@ -1,4 +1,6 @@
 using StorageSystem.Domain.Entities;
+using StorageSystem.Application.Interfaces;
+using StorageSystem.Domain.Enums;
 
 namespace StorageSystem.Application.UseCases.Files.CreateFile;
 
@@ -8,20 +10,22 @@ public sealed record CreateFileOutput(
     string StorageKey,
     string ContentType,
     long SizeBytes,
+    FileStatus Status,
     Guid FolderId,
     Guid UserId,
-    string UploadUrl
+    MultipartUploadPlan Upload
 )
 {
-    public static CreateFileOutput FromFile(FileItem file, string uploadUrl)
+    public static CreateFileOutput FromFile(FileItem file, MultipartUploadPlan upload)
         => new(
             file.Id,
             file.Name,
             file.StorageKey,
             file.ContentType,
             file.SizeBytes,
+            file.Status,
             file.FolderId,
             file.UserId,
-            uploadUrl
+            upload
         );
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StorageSystem.Domain.Entities;
+using StorageSystem.Domain.Enums;
 
 namespace StorageSystem.Infrastructure.Data.EF.Persistence.Configurations;
 
@@ -28,6 +29,11 @@ public class FileConfiguration : IEntityTypeConfiguration<FileItem>
             .IsRequired();
 
         builder.Property(file => file.SizeBytes)
+            .IsRequired();
+
+        builder.Property(file => file.Status)
+            .HasConversion<int>()
+            .HasDefaultValue(FileStatus.PendingUpload)
             .IsRequired();
 
         builder.Property(file => file.CreatedAt)

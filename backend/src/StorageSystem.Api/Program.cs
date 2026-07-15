@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAndConfigureControllers(builder.Configuration);
 builder.Services.AddAppConnections(builder.Configuration);
+builder.Services.AddAppStorage(builder.Configuration);
 builder.Services.AddAndConfigureDocumentation(builder.Configuration);
 builder.Services.AddAndConfigureAuth(builder.Configuration);
 builder.Services.AddUseCases();
@@ -14,13 +15,14 @@ app.ApplyDatabaseMigrations();
 
 app.UseDocumentation(builder.Configuration);
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
 
 if (builder.Configuration.GetSection("AllowedOrigins").Exists())
 {
     app.UseCors("AllowSpecificOrigins");
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

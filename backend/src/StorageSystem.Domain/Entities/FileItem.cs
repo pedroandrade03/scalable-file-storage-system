@@ -1,3 +1,4 @@
+using StorageSystem.Domain.Enums;
 using StorageSystem.Domain.SeedWork;
 using StorageSystem.Domain.Validation;
 
@@ -9,6 +10,7 @@ public class FileItem : AggregateRoot
     public string StorageKey { get; private set; } = null!;
     public string ContentType { get; private set; } = null!;
     public long SizeBytes { get; private set; }
+    public FileStatus Status { get; private set; }
 
     public Guid FolderId { get; private set; }
     public Guid UserId { get; private set; }
@@ -28,6 +30,7 @@ public class FileItem : AggregateRoot
         Name = name;
         ContentType = contentType;
         SizeBytes = sizeBytes;
+        Status = FileStatus.PendingUpload;
         FolderId = folderId;
         UserId = userId;
 
@@ -36,6 +39,11 @@ public class FileItem : AggregateRoot
         Name = name.Trim();
         ContentType = contentType.Trim();
         StorageKey = BuildStorageKey(userId, folderId, Id, Name);
+    }
+
+    public void MarkUploadCompleted()
+    {
+        Status = FileStatus.Available;
     }
 
     private void Validate()

@@ -1,7 +1,9 @@
 using FluentAssertions;
 using Moq;
 using StorageSystem.Application.Exceptions;
+using StorageSystem.Application.Interfaces;
 using StorageSystem.Application.UseCases.Files.CreateFile;
+using StorageSystem.Domain.Enums;
 using DomainEntity = StorageSystem.Domain.Entities;
 
 namespace StorageSystem.UnitTests.Application.Files.CreateFile;
@@ -25,7 +27,16 @@ public class CreateFileCommandHandlerTest
         var userId = _fixture.GetValidUserId();
         var folder = _fixture.GetExampleFolder(userId);
         var command = _fixture.GetValidCommand(userId, folder.Id);
-        const string uploadUrl = "https://minio.local/upload";
+        var uploadPlan = new MultipartUploadPlan(
+            "upload-id",
+            5 * 1024 * 1024,
+            2,
+            new DateTimeOffset(2026, 7, 1, 18, 30, 0, TimeSpan.Zero),
+            [
+                new MultipartUploadPartUrl(1, "https://minio.local/upload?partNumber=1"),
+                new MultipartUploadPartUrl(2, "https://minio.local/upload?partNumber=2")
+            ]
+        );
 
         userRepository
             .Setup(r => r.ExistsAsync(userId, It.IsAny<CancellationToken>()))
@@ -51,7 +62,7 @@ public class CreateFileCommandHandlerTest
                 command.SizeBytes,
                 It.IsAny<CancellationToken>()
             ))
-            .ReturnsAsync(uploadUrl);
+            .ReturnsAsync(uploadPlan);
 
         var handler = new CreateFileCommandHandler(
             fileRepository.Object,
@@ -82,9 +93,10 @@ public class CreateFileCommandHandlerTest
         output.Name.Should().Be(command.Name.Trim());
         output.ContentType.Should().Be(command.ContentType.Trim());
         output.SizeBytes.Should().Be(command.SizeBytes);
+        output.Status.Should().Be(FileStatus.PendingUpload);
         output.FolderId.Should().Be(folder.Id);
         output.UserId.Should().Be(userId);
-        output.UploadUrl.Should().Be(uploadUrl);
+        output.Upload.Should().BeEquivalentTo(uploadPlan);
         output.Id.Should().NotBe(Guid.Empty);
         output.StorageKey.Should().NotBeNullOrWhiteSpace();
     }
