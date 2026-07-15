@@ -25,6 +25,12 @@ public interface IFileRepository
         CancellationToken cancellationToken
     );
 
+    Task<IReadOnlyList<FileItem>> ListByFolderAsync(
+        Guid userId,
+        Guid folderId,
+        CancellationToken cancellationToken
+    );
+
     Task InsertAsync(FileItem file, CancellationToken cancellationToken);
 
     Task DeleteAsync(FileItem file, CancellationToken cancellationToken);

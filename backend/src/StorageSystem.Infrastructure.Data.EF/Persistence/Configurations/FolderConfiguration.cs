@@ -27,8 +27,8 @@ public class FolderConfiguration : IEntityTypeConfiguration<Folder>
             .HasForeignKey(folder => folder.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(folder => folder.SubFolders)
-            .WithOne()
+        builder.HasOne<Folder>()
+            .WithMany()
             .HasForeignKey(folder => folder.ParentFolderId)
             .OnDelete(DeleteBehavior.Restrict);
 

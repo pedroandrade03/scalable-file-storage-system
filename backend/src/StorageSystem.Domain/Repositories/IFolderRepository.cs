@@ -25,6 +25,12 @@ public interface IFolderRepository
         CancellationToken cancellationToken
     );
 
+    Task<IReadOnlyList<Folder>> ListByParentAsync(
+        Guid userId,
+        Guid? parentFolderId,
+        CancellationToken cancellationToken
+    );
+
     Task InsertAsync(Folder folder, CancellationToken cancellationToken);
 
     Task DeleteAsync(Folder folder, CancellationToken cancellationToken);

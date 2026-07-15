@@ -33,7 +33,6 @@ public class FolderTest
         folder.CreatedAt.Should().NotBeSameDateAs(default);
         (folder.CreatedAt >= dateTimeBefore).Should().BeTrue();
         (folder.CreatedAt <= dateTimeAfter).Should().BeTrue();
-        folder.SubFolders.Should().BeEmpty();
     }
 
     [Theory(DisplayName = nameof(InstantiateErrorWhenNameIsEmpty))]

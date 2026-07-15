@@ -1,4 +1,5 @@
 using FluentAssertions;
+using StorageSystem.Domain.Enums;
 using StorageSystem.Infrastructure.Data.EF.Persistence.UnitOfWork;
 using Repository = StorageSystem.Infrastructure.Data.EF.Repositories;
 
@@ -29,6 +30,7 @@ public class FileRepositoryTest
         dbFile!.Name.Should().Be(exampleFile.Name);
         dbFile.ContentType.Should().Be(exampleFile.ContentType);
         dbFile.SizeBytes.Should().Be(exampleFile.SizeBytes);
+        dbFile.Status.Should().Be(FileStatus.PendingUpload);
         dbFile.StorageKey.Should().Be(exampleFile.StorageKey);
         dbFile.FolderId.Should().Be(exampleFile.FolderId);
         dbFile.UserId.Should().Be(exampleFile.UserId);
@@ -240,6 +242,33 @@ public class FileRepositoryTest
         );
 
         exists.Should().BeFalse();
+    }
+
+    [Fact(DisplayName = nameof(ListByFolderReturnsOnlyOwnedFilesInFolder))]
+    [Trait("Integration/Infrastructure", "FileRepository - Repositories")]
+    public async Task ListByFolderReturnsOnlyOwnedFilesInFolder()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var userId = Guid.NewGuid();
+        var folderId = Guid.NewGuid();
+        var file = _fixture.GetExampleFile(userId, folderId);
+        var anotherFile = _fixture.GetExampleFile(userId, folderId);
+        var siblingFolderFile = _fixture.GetExampleFile(userId, Guid.NewGuid());
+        var anotherUsersFile = _fixture.GetExampleFile(Guid.NewGuid(), folderId);
+        await dbContext.Files.AddRangeAsync(
+            file,
+            anotherFile,
+            siblingFolderFile,
+            anotherUsersFile
+        );
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FileRepository(_fixture.CreateDbContext(true));
+
+        var files = await repository.ListByFolderAsync(userId, folderId, CancellationToken.None);
+
+        files.Select(listedFile => listedFile.Id).Should()
+            .BeEquivalentTo([file.Id, anotherFile.Id]);
     }
 
     [Fact(DisplayName = nameof(DeleteRemovesMetadataAfterCommit))]

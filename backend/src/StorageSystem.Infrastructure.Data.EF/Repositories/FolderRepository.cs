@@ -48,6 +48,19 @@ public class FolderRepository(ApplicationDbContext context) : IFolderRepository
             cancellationToken
         );
 
+    public async Task<IReadOnlyList<Folder>> ListByParentAsync(
+        Guid userId,
+        Guid? parentFolderId,
+        CancellationToken cancellationToken
+    )
+        => await _folders
+            .Where(folder =>
+                folder.UserId == userId &&
+                folder.ParentFolderId == parentFolderId
+            )
+            .OrderBy(folder => folder.Name)
+            .ToListAsync(cancellationToken);
+
     public async Task InsertAsync(Folder folder, CancellationToken cancellationToken)
         => await _folders.AddAsync(folder, cancellationToken);
 

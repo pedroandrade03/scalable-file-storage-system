@@ -239,6 +239,62 @@ public class FolderRepositoryTest
         hasSubFolders.Should().BeFalse();
     }
 
+    [Fact(DisplayName = nameof(ListByParentReturnsOnlyOwnedRootFolders))]
+    [Trait("Integration/Infrastructure", "FolderRepository - Repositories")]
+    public async Task ListByParentReturnsOnlyOwnedRootFolders()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var userId = Guid.NewGuid();
+        var rootFolder = _fixture.GetExampleFolder(userId);
+        var anotherRootFolder = _fixture.GetExampleFolder(userId);
+        var childFolder = _fixture.GetExampleFolder(userId, rootFolder.Id);
+        var anotherUsersRootFolder = _fixture.GetExampleFolder(Guid.NewGuid());
+        await dbContext.Folders.AddRangeAsync(
+            rootFolder,
+            anotherRootFolder,
+            childFolder,
+            anotherUsersRootFolder
+        );
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FolderRepository(_fixture.CreateDbContext(true));
+
+        var folders = await repository.ListByParentAsync(userId, null, CancellationToken.None);
+
+        folders.Select(folder => folder.Id).Should()
+            .BeEquivalentTo([rootFolder.Id, anotherRootFolder.Id]);
+    }
+
+    [Fact(DisplayName = nameof(ListByParentReturnsOnlyOwnedChildFolders))]
+    [Trait("Integration/Infrastructure", "FolderRepository - Repositories")]
+    public async Task ListByParentReturnsOnlyOwnedChildFolders()
+    {
+        var dbContext = _fixture.CreateDbContext();
+        var userId = Guid.NewGuid();
+        var parentFolder = _fixture.GetExampleFolder(userId);
+        var childFolder = _fixture.GetExampleFolder(userId, parentFolder.Id);
+        var siblingFolder = _fixture.GetExampleFolder(userId);
+        var anotherUsersChildFolder = _fixture.GetExampleFolder(Guid.NewGuid(), parentFolder.Id);
+        await dbContext.Folders.AddRangeAsync(
+            parentFolder,
+            childFolder,
+            siblingFolder,
+            anotherUsersChildFolder
+        );
+        await dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var repository = new Repository.FolderRepository(_fixture.CreateDbContext(true));
+
+        var folders = await repository.ListByParentAsync(
+            userId,
+            parentFolder.Id,
+            CancellationToken.None
+        );
+
+        folders.Should().ContainSingle();
+        folders[0].Id.Should().Be(childFolder.Id);
+    }
+
     [Fact(DisplayName = nameof(DeleteRemovesFolderAfterCommit))]
     [Trait("Integration/Infrastructure", "FolderRepository - Repositories")]
     public async Task DeleteRemovesFolderAfterCommit()

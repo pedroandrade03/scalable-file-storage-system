@@ -6,6 +6,7 @@ using StorageSystem.Api.ApiModels.Response;
 using StorageSystem.Application.Interfaces;
 using StorageSystem.Application.UseCases.Folders.CreateFolder;
 using StorageSystem.Application.UseCases.Folders.DeleteFolder;
+using StorageSystem.Application.UseCases.Folders.ListFolderContents;
 
 namespace StorageSystem.Api.Controllers;
 
@@ -17,6 +18,24 @@ public class FoldersController(
     ICurrentUserAccessor currentUser
 ) : ControllerBase
 {
+    [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse<ListFolderContentsOutput>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> List(
+        [FromQuery] Guid? parentFolderId,
+        CancellationToken cancellationToken
+    )
+    {
+        var userId = await currentUser.GetUserIdAsync(cancellationToken);
+
+        var output = await mediator.Send(
+            new ListFolderContentsQuery(userId, parentFolderId),
+            cancellationToken
+        );
+
+        return Ok(new ApiResponse<ListFolderContentsOutput>(output));
+    }
+
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<CreateFolderOutput>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

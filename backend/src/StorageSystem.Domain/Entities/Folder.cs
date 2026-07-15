@@ -3,14 +3,11 @@ using StorageSystem.Domain.Validation;
 
 namespace StorageSystem.Domain.Entities;
 
-public class Folder : AggregateRoot
+public sealed class Folder : AggregateRoot
 {
     public string Name { get; private set; } = null!;
     public Guid UserId { get; private set; }
     public Guid? ParentFolderId { get; private set; }
-
-    private readonly List<Folder> _subFolders = new();
-    public IReadOnlyCollection<Folder> SubFolders => _subFolders.AsReadOnly();
 
     private Folder()
     {

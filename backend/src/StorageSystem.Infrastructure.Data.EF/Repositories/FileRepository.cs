@@ -48,6 +48,19 @@ public class FileRepository(ApplicationDbContext context) : IFileRepository
             cancellationToken
         );
 
+    public async Task<IReadOnlyList<FileItem>> ListByFolderAsync(
+        Guid userId,
+        Guid folderId,
+        CancellationToken cancellationToken
+    )
+        => await _files
+            .Where(file =>
+                file.UserId == userId &&
+                file.FolderId == folderId
+            )
+            .OrderBy(file => file.Name)
+            .ToListAsync(cancellationToken);
+
     public async Task InsertAsync(FileItem file, CancellationToken cancellationToken)
         => await _files.AddAsync(file, cancellationToken);
 
