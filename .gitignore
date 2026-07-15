@@ -5,6 +5,7 @@
 **/.vs/
 **/.vscode/
 **/.idea/
+.env
 *.user
 *.suo
 *.nupkg

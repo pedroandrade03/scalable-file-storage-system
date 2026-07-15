@@ -68,18 +68,24 @@ Client / Swagger UI
 
 ### 1. Environment Variables
 
-Create a `.env` file in the repository root:
+Copy `.env.example` to `.env` in the repository root and adjust values if needed:
+
+```bash
+cp .env.example .env
+```
+
+Expected variables:
 
 ```env
 MINIO_ROOT_USER=admin
-MINIO_ROOT_PASSWORD=supersecret
+MINIO_ROOT_PASSWORD=change-me
 
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+POSTGRES_PASSWORD=change-me
 POSTGRES_DB=storage_db
 
 KEYCLOAK_USER=admin
-KEYCLOAK_PASSWORD=admin
+KEYCLOAK_PASSWORD=change-me
 KEYCLOAK_AUTHORITY=http://localhost:8081/realms/StorageSystemRealm
 KEYCLOAK_CLIENT_ID=storage-swagger
 KEYCLOAK_FRONTEND_CLIENT_ID=storage-frontend
