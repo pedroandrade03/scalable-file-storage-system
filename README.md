@@ -11,7 +11,7 @@ This project is designed as a portfolio-grade backend: it keeps infrastructure l
 - Stable user mapping by `ExternalProvider + ExternalSubject`, instead of relying only on email.
 - Folder creation with nested folder support.
 - File metadata creation linked to users and folders.
-- Presigned upload and download URLs backed by MinIO.
+- Multipart upload plans and presigned download URLs backed by MinIO.
 - PostgreSQL persistence with EF Core migrations.
 - Swagger UI with OAuth2 Authorization Code + PKCE flow.
 - Docker Compose setup for API, PostgreSQL, MinIO, and Keycloak.
@@ -54,7 +54,7 @@ Client / Swagger UI
 - **External identity mapping:** Users are linked by `ExternalProvider + ExternalSubject`, where `ExternalSubject` comes from the OIDC `sub` claim. This is more stable than email, which can change.
 - **PostgreSQL for hierarchy:** Object storage is flat, so folder nesting and ownership live in a relational database.
 - **MinIO for local S3 compatibility:** The project can run locally without cloud dependencies while preserving an S3-like storage model.
-- **Presigned URLs:** File upload and download can happen directly against object storage, avoiding unnecessary file traffic through the API.
+- **Multipart presigned uploads:** File creation returns an S3 multipart upload plan with one presigned URL per part, so clients can chunk large files and send the bytes directly to object storage. The API only receives metadata and the final multipart completion request.
 - **Versioned migrations:** Database schema changes are explicit and reproducible with EF Core migrations.
 - **Layered tests:** The test suite separates domain/application behavior, persistence integration, and HTTP end-to-end flows.
 
@@ -133,15 +133,25 @@ All storage endpoints require authentication.
 
 ```http
 POST /folders
+GET  /folders?parentFolderId={folderId}
 POST /files
+POST /files/{fileId}/complete-upload
 GET  /files/{fileId}/download
+DELETE /files/{fileId}
+DELETE /folders/{folderId}
 ```
 
 Current behavior:
 
 - `POST /folders` creates a folder for the authenticated user.
-- `POST /files` creates file metadata and returns a presigned upload URL.
+- `GET /folders` lists child folders and files for the authenticated user. Root listing is requested without `parentFolderId`.
+- `POST /files` creates file metadata and returns a multipart upload plan.
+- The upload plan includes `uploadId`, `partSizeBytes`, `totalParts`, `expiresAtUtc`, and one presigned URL per part.
+- Clients split the file using `partSizeBytes`, upload each chunk directly to MinIO, then call `POST /files/{fileId}/complete-upload` with `uploadId` and each part `ETag`.
+- `POST /files/{fileId}/complete-upload` completes the S3 multipart upload and marks the file as available.
 - `GET /files/{fileId}/download` returns a presigned download URL.
+- `DELETE /files/{fileId}` removes file metadata and the object from storage.
+- `DELETE /folders/{folderId}` removes an empty folder.
 
 ## Authentication Model
 
